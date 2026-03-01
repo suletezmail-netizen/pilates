@@ -5,8 +5,8 @@ from bs4 import BeautifulSoup
 import os
 
 # Telegram bilgileri
-BOT_TOKEN = os.getenv("BOT_TOKEN")
-CHAT_ID = os.getenv("CHAT_ID")
+BOT_TOKEN = os.getenv("BOT_TOKEN")  # Telegram bot token
+CHAT_ID = os.getenv("CHAT_ID")      # Senin chat ID
 
 URL = "https://www.tcf.gov.tr/faaliyetler/"
 KEYWORD = "Pilates"
@@ -28,13 +28,14 @@ def fetch_courses():
     courses = []
 
     # Sayfadaki faaliyetleri al
-    for item in soup.find_all("div", class_="faaliyet-card"):  # class sayfaya göre değişebilir
+    for item in soup.find_all("div", class_="faaliyet-card"):  # sayfadaki class'a göre değişebilir
         text = item.get_text(strip=True)
         if KEYWORD.lower() in text.lower():
             courses.append(text)
     return courses
 
 def send_alert(message):
+    # HTTP üzerinden Telegram API ile mesaj gönder
     url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
     params = {"chat_id": CHAT_ID, "text": message}
     try:
