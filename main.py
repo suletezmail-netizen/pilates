@@ -2,23 +2,20 @@ import time
 import requests
 import json
 from bs4 import BeautifulSoup
-from telegram import Bot
 import os
 
-# Telegram bilgileri (ENV üzerinden al)
+# Telegram bilgileri
 BOT_TOKEN = os.getenv("BOT_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
-
-bot = Bot(token=BOT_TOKEN)
 
 URL = "https://www.tcf.gov.tr/faaliyetler/"
 KEYWORD = "Pilates"
 CHECK_INTERVAL = 300  # 5 dakika
 
-# Kaydedilen kursları tutacak dosya
+# Daha önce görülen kursları saklamak için dosya
 DATA_FILE = "seen_pilates.json"
 
-# Daha önce kaydedilen kursları yükle
+# Önceki kursları yükle
 try:
     with open(DATA_FILE, "r", encoding="utf-8") as f:
         seen_courses = set(json.load(f))
@@ -38,7 +35,12 @@ def fetch_courses():
     return courses
 
 def send_alert(message):
-    bot.send_message(chat_id=CHAT_ID, text=message)
+    url = f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage"
+    params = {"chat_id": CHAT_ID, "text": message}
+    try:
+        requests.get(url, params=params)
+    except Exception as e:
+        print(f"Telegram mesajı gönderilemedi: {e}")
 
 while True:
     try:
